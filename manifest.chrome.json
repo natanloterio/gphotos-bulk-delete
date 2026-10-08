@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Google Photos Bulk Delete",
+  "version": "0.1.0",
+  "description": "Selects every photo in your Google Photos library and moves the selection to the bin.",
+  "host_permissions": ["https://photos.google.com/*"],
+  "action": {
+    "default_title": "Google Photos Bulk Delete"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://photos.google.com/*"],
+      "js": [
+        "content/selection-loop.js",
+        "content/deleter.js",
+        "content/selectors.js",
+        "content/panel.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

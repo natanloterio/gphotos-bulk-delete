@@ -1,3 +1,6 @@
+// Firefox exposes `browser`, Chrome only `chrome`; both return promises in MV3.
+const api = globalThis.browser ?? globalThis.chrome;
+
 const PHOTOS_URL = "https://photos.google.com/";
 const TOGGLE_PANEL = "gpbd:toggle-panel";
 
@@ -9,20 +12,20 @@ function isPhotosTab(tab) {
 
 async function onActionClicked(tab) {
   if (!isPhotosTab(tab)) {
-    await browser.tabs.create({ url: PHOTOS_URL });
+    await api.tabs.create({ url: PHOTOS_URL });
     return;
   }
   try {
-    await browser.tabs.sendMessage(tab.id, { type: TOGGLE_PANEL });
+    await api.tabs.sendMessage(tab.id, { type: TOGGLE_PANEL });
   } catch (error) {
     // The tab was open before the extension loaded, so it has no content
     // script yet. Reloading injects it.
     console.warn("Panel not reachable, reloading tab:", error);
-    await browser.tabs.reload(tab.id);
+    await api.tabs.reload(tab.id);
   }
 }
 
-browser.action.onClicked.addListener((tab) => {
+api.action.onClicked.addListener((tab) => {
   onActionClicked(tab).catch((error) => {
     console.error("Google Photos Bulk Delete failed to open:", error);
   });

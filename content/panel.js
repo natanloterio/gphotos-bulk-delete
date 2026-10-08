@@ -4,6 +4,9 @@
   const { runSelection, moveSelectionToBin, pageAdapter, SELECTION_STATUS } =
     root.GPBD;
 
+  // Firefox exposes `browser`, Chrome only `chrome`.
+  const api = root.browser ?? root.chrome;
+
   const TOGGLE_PANEL = "gpbd:toggle-panel";
   const HOST_ID = "gpbd-panel-host";
 
@@ -171,7 +174,7 @@
     const view = buildView();
     mount(view);
     createController(view);
-    browser.runtime.onMessage.addListener((message) => {
+    api.runtime.onMessage.addListener((message) => {
       if (message && message.type === TOGGLE_PANEL) {
         view.panel.hidden = !view.panel.hidden;
       }

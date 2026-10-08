@@ -1,6 +1,6 @@
 # Google Photos Bulk Delete
 
-A Firefox extension that selects every photo in your Google Photos library and
+A browser extension for Firefox and Chrome that selects every photo in your Google Photos library and
 moves the whole selection to the bin.
 
 Google's official Photos API cannot delete photos, and the web app has no
@@ -9,8 +9,9 @@ yourself: it scrolls through the library ticking every photo, then presses the
 page's own delete button once you confirm.
 
 > **Status: experimental.** The scroll-and-select logic is unit tested, but the
-> selectors for Google's page have not been verified against the live site.
-> Run the dry run first, and expect to adjust `content/selectors.js`.
+> selectors for Google's page have not been verified against the live site,
+> and the Chrome build has not been loaded in Chrome yet. Run the dry run
+> first, and expect to adjust `content/selectors.js`.
 
 ## What it does
 
@@ -30,14 +31,33 @@ with it.** Export anything you want to keep with
 
 ## Install
 
-The extension is not published on addons.mozilla.org. Load it as a temporary
-add-on:
+The extension is not published on any add-on store. Clone or download this
+repository, then load it by hand.
 
-1. Clone or download this repository.
-2. Open `about:debugging#/runtime/this-firefox` in Firefox 127 or newer.
-3. Click **Load Temporary Add-on…** and pick `manifest.json`.
+### Firefox
+
+1. Open `about:debugging#/runtime/this-firefox` in Firefox 127 or newer.
+2. Click **Load Temporary Add-on…** and pick `manifest.json` from the
+   repository root.
 
 Firefox removes temporary add-ons when it restarts; load it again when needed.
+
+### Chrome
+
+Chrome needs a different manifest, so its build is assembled into its own
+folder (requires Node.js):
+
+```
+node scripts/build-chrome.js
+```
+
+1. Open `chrome://extensions` and turn on **Developer mode** (top right).
+2. Click **Load unpacked** and pick the `dist/chrome` folder.
+3. Pin the extension from the puzzle-piece menu so its button is visible.
+
+The same build should load in other Chromium browsers such as Edge and Brave.
+Run the build again after pulling changes, then press the reload icon on the
+extension's card.
 
 ## Use
 
@@ -51,7 +71,7 @@ Firefox removes temporary add-ons when it restarts; load it again when needed.
 4. **Real run.** Untick the dry run, press **Start**, wait for it to reach the
    end of the library, then press **Move N to bin**.
 
-Keep the tab in the foreground while it runs, because Firefox throttles
+Keep the tab in the foreground while it runs, because browsers throttle
 background tabs. **Stop** halts at once and leaves the selection as it is.
 
 ### Options
@@ -93,7 +113,9 @@ dependencies.
 ## Project layout
 
 ```
-manifest.json                Manifest V3, Firefox
+manifest.json                Firefox manifest (the root is the Firefox build)
+manifest.chrome.json         Chrome manifest
+scripts/build-chrome.js      Assembles the Chrome build in dist/chrome
 background.js                Toolbar button: toggles the panel
 content/selection-loop.js    Scroll-and-select logic, DOM-free
 content/deleter.js           Delete button + confirmation sequence
@@ -108,8 +130,9 @@ test/                        Unit tests (node:test)
 node --test
 ```
 
-The tests run the selection loop and the delete sequence against fakes. They
-do not exercise the real Google Photos page.
+The tests run the selection loop and the delete sequence against fakes, and
+check that the two manifests stay in sync. They do not exercise the real
+Google Photos page.
 
 ## Disclaimer
 
